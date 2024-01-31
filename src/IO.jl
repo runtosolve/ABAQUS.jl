@@ -1,18 +1,9 @@
-module IO 
+module IO
+
+using ReadWriteFind
 
 
-function write_file(save_filename, lines)
-
-    file = open(save_filename,"w")
-
-    for i in eachindex(lines)
-        write(file,"\n",lines[i])
-    end
-
-    close(file)
-
-end
-
+write_file(save_filename, lines) = ReadWriteFind.write_file(save_filename, lines)
 
 
 end #module

@@ -88,7 +88,7 @@ function ELASTIC(E, ν)
 
     lines = "*Elastic"
 
-    lines = [lines; format(fmt, E, ν)
+    lines = [lines; format(fmt, E, ν)]
 
     return lines
 
@@ -98,19 +98,33 @@ end
 
 
 #need to add multiple dispatch here to cover other element types
-#for now this only works for 4 node shells 
-function ELEMENT(elements, type)   
+function ELEMENT(elements, type, nodes_per_element)   
 
     lines = Matrix{String}(undef, size(elements)[1]+1, 1)
 
-    fmt = "{:7d},{:7d},{:7d},{:7d},{:7d}"
+    if nodes_per_element == 4
 
-    lines[1] = "*Element, type=" * type
+        fmt = "{:7d},{:7d},{:7d},{:7d},{:7d}"
 
-    for i=1:size(elements)[1]
+        lines[1] = "*Element, type=" * type
 
-        lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4],
-                            elements[i,5])
+        for i=1:size(elements)[1]
+
+            lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4],
+                                elements[i,5])
+        end
+
+    elseif nodes_per_element == 3
+
+        fmt = "{:7d},{:7d},{:7d},{:7d}"
+
+        lines[1] = "*Element, type=" * type
+
+        for i=1:size(elements)[1]
+
+            lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4])
+        end
+
     end
 
     return lines 
@@ -126,7 +140,7 @@ function ELEMENT_OUTPUT(directions, fields)
     line = string[]
     for i in eachindex(fields)
         
-        if i == end
+        if i == size(fields)[1]
             line = line * fields[i]
         else
             line = line * fields[i] * "," 
@@ -148,7 +162,7 @@ function ELEMENT_OUTPUT(directions, fields, elset)
     line = string[]
     for i in eachindex(fields)
         
-        if i == end
+        if i == size(fields)[1]
             line = line * fields[i]
         else
             line = line * fields[i] * "," 
@@ -217,6 +231,24 @@ function MATERIAL(name)
 end
 
 
+function NODE(nodes)
+
+ 
+    lines = Matrix{String}(undef, size(nodes)[1]+1, 1)
+
+    lines[1] = "*Node"
+
+    fmt = "{:14d},{:14.8f},{:14.8f},{:14.8f}"
+
+    for i=1:size(nodes)[1]
+        lines[i+1] = format(fmt, nodes[i, 1], nodes[i, 2], nodes[i, 3], nodes[i, 4])
+    end
+
+    return lines
+
+end
+
+
 function NODE_OUTPUT(fields)
 
     lines = "*Node Output"
@@ -224,7 +256,7 @@ function NODE_OUTPUT(fields)
     line = string[]
     for i in eachindex(fields)
         
-        if i == end
+        if i == size(fields)[1]
             line = line * fields[i]
         else
             line = line * fields[i] * "," 
@@ -291,35 +323,20 @@ end
 
 
 
-function NODE(nodes)
-
- 
-    lines = Matrix{String}(undef, size(nodes)[1]+1, 1)
-
-    lines[1] = "*Node"
-
-    fmt = "{:14d},{:14.8f},{:14.8f},{:14.8f}"
-
-    for i=1:size(nodes)[1]
-        lines[i+1] = format(fmt, nodes[i, 1], nodes[i, 2], nodes[i, 3], nodes[i, 4])
-    end
-
-    return lines
-
-end
 
 
-function NSET(name, range)
 
-    lines = "*Nset, nset=" * name * ", generate"
+# function NSET(name, range)
 
-    fmt = "{:7d},{:7d},{:7d}"
+#     lines = "*Nset, nset=" * name * ", generate"
 
-    lines = [lines; format(fmt, range[1], range[2], range[3])]
+#     fmt = "{:7d},{:7d},{:7d}"
 
-    return lines
+#     lines = [lines; format(fmt, range[1], range[2], range[3])]
 
-end
+#     return lines
+
+# end
 
 
 function OUTPUT(field_or_history, variable)
