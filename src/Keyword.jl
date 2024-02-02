@@ -3,18 +3,19 @@ module Keyword
 using Formatting
 
 
-function BOUNDARY(node_set_names, degrees_of_freedom)
+function BOUNDARY(node_set_name, degrees_of_freedom)
 
     lines = "*Boundary"
 
-    fmt = "{:s},{d2}"
+    fmt = "{:s}, {:d2}"
 
-    for i in eachindex(node_set_names)
+    for i in eachindex(degrees_of_freedom)
 
-        lines = [lines; format(fmt, node_set_names[i], degrees_of_freedom[i])]
+        lines = [lines; format(fmt, node_set_name, degrees_of_freedom[i])]
 
     end
 
+    return lines
 
 end
 
@@ -23,7 +24,7 @@ function CLOAD(node_set_name, degree_of_freedom, magnitude)
 
     lines = "*Cload"
 
-    fmt = "{:s},{d2},{7.4:f}"
+    fmt = "{:s}, {:d2}, {:7.4f}"
 
     lines = [lines; format(fmt, node_set_name, degree_of_freedom, magnitude)]
 
@@ -137,13 +138,13 @@ function ELEMENT_OUTPUT(directions, fields)
     fmt = "*Element Output, directions={:s}"
     lines = format(fmt, directions)
 
-    line = string[]
-    for i in eachindex(fields)
+    line = ""
+    for i = 1:size(fields)[1]
         
         if i == size(fields)[1]
             line = line * fields[i]
         else
-            line = line * fields[i] * "," 
+            line = line * fields[i] * ", " 
         end
 
     end
@@ -165,7 +166,7 @@ function ELEMENT_OUTPUT(directions, fields, elset)
         if i == size(fields)[1]
             line = line * fields[i]
         else
-            line = line * fields[i] * "," 
+            line = line * fields[i] * ", " 
         end
 
     end
@@ -177,19 +178,52 @@ function ELEMENT_OUTPUT(directions, fields, elset)
 end
 
 
+function ELSET(elements, name)
+
+    #Define number of elements in set.
+    num_elements=size(elements)[1]
+
+    #Figure out the number of rows in the set.
+    residual = num_elements/16 - floor(Int, num_elements/16)
+
+    if residual == 0.0
+
+        num_rows = floor(Int, num_elements/16)
+
+    else
+
+        num_rows = floor(Int, num_elements/16) + 1
+        elements = [elements; zeros(Int, 16 - (num_elements - (num_rows - 1) * 16))]
+
+    end
+
+    lines = "*Elset, elset=" * name
+
+    for i=1:num_rows
+
+        #Define the element list formatting.
+        fmt = "{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d},{:7d}"
+
+        range_start = (i-1) * 16 + 1
+        range_end = i * 16  
+        range = range_start:range_end
+
+        lines = [lines; format(fmt, elements[range[1]], elements[range[2]], elements[range[3]], elements[range[4]], elements[range[5]], elements[range[6]], elements[range[7]], elements[range[8]], elements[range[9]], elements[range[10]], elements[range[11]], elements[range[12]], elements[range[13]], elements[range[14]], elements[range[15]], elements[range[16]])]
+
+    end
 
 
-function ELSET(name, range)
+    if residual != 0.0
 
-    lines = "*Elset, elset=" * name * ", generate"
+        index = findfirst(" 0,", lines[end])[1]
+        lines[end] = lines[end][1:index - 7]
 
-    fmt = "{:7d},{:7d},{:7d}"
-
-    lines = [lines; format(fmt, range[1], range[2], range[3])]
-
+    end
+        
     return lines
 
 end
+
 
 
 function FRICTION(slip_tolerance, friction_coeff)
@@ -253,13 +287,13 @@ function NODE_OUTPUT(fields)
 
     lines = "*Node Output"
 
-    line = string[]
+    line = ""
     for i in eachindex(fields)
         
         if i == size(fields)[1]
             line = line * fields[i]
         else
-            line = line * fields[i] * "," 
+            line = line * fields[i] * ", " 
         end
 
     end
@@ -309,7 +343,7 @@ function NSET(nodes, name)
 
     if residual != 0.0
 
-        index = findfirst(" 0,", list[end])[1]
+        index = findfirst(" 0,", lines[end])[1]
         lines[end] = lines[end][1:index - 7]
 
     end
@@ -369,9 +403,10 @@ function PLASTIC(curve)
     fmt = "{:9.6f}, {:9.6f}"
     lines = Matrix{String}(undef, size(curve)[1]+1, 1)
 
+    lines[1] = "*Plastic"
 
     for i = 1:size(curve)[1]
-        lines[i] = format(fmt, curve[i, 1], curve[i, 2])
+        lines[i+1] = format(fmt, curve[i, 1], curve[i, 2])
     end
 
     return lines
@@ -397,13 +432,20 @@ end
 
 
 
-function SHELL_SECTION(elset_name, material_name, offset, t, formulation)
+function SHELL_SECTION(elset_name, material_name, offset, t, num_integration_points)
 
-    lines = "*Shell Section, elset=" * elset_name * ", material=" * material_name * ", offset=" * offset
+    start_line = "*Shell Section, elset=" * elset_name * ", material=" * material_name * ", offset=" 
+    
+    if typeof(offset) == String
+        fmt = "{:s}{:s}"
+    elseif typeof(offset) == Float64
+        fmt = "{:s}{:2.1f}"
+    end
+
+    lines = format(fmt, start_line, offset)
 
     fmt = "{:7.4f},{:2d}"
-
-    lines = [lines; format(fmt, t, formulation)]
+    lines = [lines; format(fmt, t, num_integration_points)]
 
     return lines
 
@@ -415,7 +457,7 @@ function STATIC(stabilize, allsdtol, continue_flag, initial_time_increment, step
     fmt = "*Static, stabilize={:7.5f}, allsdtol={:7.5f}, continue={:s}"
     lines = format(fmt, stabilize, allsdtol, continue_flag)
 
-    fmt = "{:7.4f},{:7.4f},{:7.4E},{:7.4f}"
+    fmt = "{:7.4f},{:7.4f}, {:7.4E},{:7.4f}"
     lines = [lines; format(fmt, initial_time_increment, step_time_period, minimum_time_increment, maximum_time_increment)]
 
 end
