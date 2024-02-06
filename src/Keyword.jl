@@ -429,8 +429,11 @@ function RESTART(read_or_write, frequency)
 
 end
 
+function RIGID_BODY(ref_node, pin_or_tie, nset_name)
 
+    lines = "*Rigid Body, ref node=" * string(ref_node) * ", " * pin_or_tie * " nset=" * nset_name
 
+end
 
 function SHELL_SECTION(elset_name, material_name, offset, t, num_integration_points)
 
