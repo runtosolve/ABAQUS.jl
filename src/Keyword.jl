@@ -1,6 +1,6 @@
 module Keyword
 
-using Formatting
+using Formatting, Printf
 
 
 function BOUNDARY(node_set_name, degrees_of_freedom)
@@ -14,6 +14,43 @@ function BOUNDARY(node_set_name, degrees_of_freedom)
         lines = [lines; format(fmt, node_set_name, degrees_of_freedom[i])]
 
     end
+
+    return lines
+
+end
+
+
+function BOUNDARY(node::Int, degrees_of_freedom)
+
+    lines = "*Boundary"
+
+    fmt = "{:d8}, {:d2}"
+
+    for i in eachindex(degrees_of_freedom)
+
+        lines = [lines; format(fmt, node, degrees_of_freedom[i])]
+
+    end
+
+    return lines
+
+end
+
+
+
+
+function BUCKLE(num_modes, max_eigenvalue, num_vectors, max_iterations)
+
+    lines = "*Buckle"
+
+    if isempty(max_eigenvalue)
+        fmt = "{:d5}, , {:d5}, {:d5}"
+        lines = [lines; format(fmt, num_modes, num_vectors, max_iterations)]
+    else
+        fmt = "{:d5}, {:9.3f}, {:d5}, {:d5}"
+        lines = [lines; format(fmt, num_modes, max_eigenvalue, num_vectors, max_iterations)]
+    end
+
 
     return lines
 
@@ -35,7 +72,11 @@ end
 
 function CONNECTOR_BEHAVIOR(name)
 
-    lines = "*Connector Behavior, " * name
+    fmt = "*Connector Behavior, name={:s}"
+
+    lines = format(fmt, name)
+
+    return lines
 
 end
 
@@ -47,6 +88,18 @@ function CONNECTOR_ELASTICITY(component, magnitude)
 
     fmt = "{:7.4E},"
     lines = [lines; format(fmt, magnitude)]
+
+    return lines
+
+end
+
+function CONNECTOR_SECTION(elset, behavior, coordinate_system)
+
+    fmt = "*Connector Section, elset={:s}, behavior={:s}"
+    lines = format(fmt, elset, behavior)
+
+    fmt = "{:s},"
+    lines = [lines; format(fmt, coordinate_system)]
 
     return lines
 
@@ -67,6 +120,51 @@ function CONTACT_INCLUSIONS(all_exterior)
     end
 
     return lines
+
+end
+
+function CONTACT_PROPERTY_ASSIGNMENT(surface_name_1, surface_name_2, surface_interaction_name)
+
+    lines = "*Contact Property Assignment"
+
+    fmt = "{:s}, {:s}, "
+
+    line = format(fmt, surface_name_1, surface_name_2)
+    line_end = @sprintf("\"%s\"", surface_interaction_name)
+
+    lines = [lines; line * line_end]
+
+    return lines
+
+end
+
+
+function CONTROLS_RESET()
+
+    lines = "*Controls, reset"
+
+end
+
+function CONTROLS_FIELD(displacement_tolerance, rotation_tolerance)
+
+        lines = "*Controls, parameters=field, field=displacement"
+        
+        fmt = "{:9.5f}, {:9.5f}, , , , , ,"
+        lines = [lines; format(fmt, displacement_tolerance, rotation_tolerance)]
+    
+    return lines 
+
+end
+
+
+function CONTROLS_LINE_SEARCH(num_iterations)
+
+    lines = "*Controls, parameters=line search"
+    
+    fmt = "{:d2}, , , ,"
+    lines = [lines; format(fmt, num_iterations)]
+
+return lines 
 
 end
 
@@ -158,9 +256,9 @@ end
 function ELEMENT_OUTPUT(directions, fields, elset)
 
     fmt = "*Element Output, elset={:s}, directions={:s}"
-    lines = format(fmt, directions, elset)
+    lines = format(fmt, elset, directions)
 
-    line = string[]
+    line = ""
     for i in eachindex(fields)
         
         if i == size(fields)[1]
@@ -215,7 +313,7 @@ function ELSET(elements, name)
 
     if residual != 0.0
 
-        index = findfirst(" 0,", lines[end])[1]
+        index = findfirst(" 0", lines[end])[1]
         lines[end] = lines[end][1:index - 7]
 
     end
@@ -225,13 +323,90 @@ function ELSET(elements, name)
 end
 
 
+function EL_PRINT(variables, elset_name)
+
+    fmt = "*El Print, elset={:s}"
+    lines = format(fmt, elset_name)
+
+    line = ""
+    for i in eachindex(variables)
+        
+        if i == size(variables)[1]
+            line = line * variables[i]
+        else
+            line = line * variables[i] * ", " 
+        end
+
+    end
+
+    lines = [lines; line]
+
+    return lines
+
+end
+
+function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, search_radius, radius_of_influence, projection_direction)
+
+    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s}, adjust orientation={:s},"
+
+    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation)
+
+    fmt = "number of layers={:2d},"
+    lines = [lines; format(fmt, number_of_layers)]
+
+    fmt = "search radius={:9.5f},"
+    lines = [lines; format(fmt, search_radius)]
+
+    fmt = "radius of influence={:9.5f}"
+    lines = [lines; format(fmt, radius_of_influence)]
+
+    fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
+    lines = [lines; format(fmt, projection_direction[1], projection_direction[2], projection_direction[3])]
+
+    return lines
+
+end
+
+
+function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, radius_of_influence, projection_direction)
+
+    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s}, adjust orientation={:s},"
+
+    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation)
+
+    fmt = "number of layers={:2d},"
+    lines = [lines; format(fmt, number_of_layers)]
+
+    fmt = "radius of influence={:9.5f}"
+    lines = [lines; format(fmt, radius_of_influence)]
+
+    fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
+    lines = [lines; format(fmt, projection_direction[1], projection_direction[2], projection_direction[3])]
+
+    return lines
+
+end
+
+
+function FASTENER_PROPERTY(name, radius)
+
+    lines = "*Fastener Property, name=" * name
+    
+    fmt = "{:9.5f}"
+    lines = [lines; format(fmt, radius)]
+
+    return lines
+end
+
+
+
 
 function FRICTION(slip_tolerance, friction_coeff)
 
-    fmt = "*Friction, slip tolerance={7.5f}"
+    fmt = "*Friction, slip tolerance={:7.5f}"
     lines = format(fmt, slip_tolerance)
     
-    fmt = "{7.5f},"
+    fmt = "{:7.5f},"
     lines = [lines; format(fmt, friction_coeff)]
 
     return lines
@@ -255,7 +430,19 @@ function HEADING(heading_lines)
 end
 
 
+function INSTANCE(instance_name, part_name, offset_coordinates)
 
+    fmt = "*Instance, name={:s}, part={:s}"
+    lines = format(fmt, instance_name, part_name)
+
+    fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
+    lines = [lines; format(fmt, offset_coordinates[1], offset_coordinates[2], offset_coordinates[3])]
+
+    lines = [lines; "*End Instance"]
+
+    return lines
+
+end
 
 
 function MATERIAL(name)
@@ -305,6 +492,27 @@ function NODE_OUTPUT(fields)
 end
 
 
+function NODE_PRINT(variables, nset_name)
+
+    fmt = "*Node Print, nset={:s}"
+    lines = format(fmt, nset_name)
+
+    line = ""
+    for i in eachindex(variables)
+        
+        if i == size(variables)[1]
+            line = line * variables[i]
+        else
+            line = line * variables[i] * ", " 
+        end
+
+    end
+
+    lines = [lines; line]
+
+    return lines
+
+end
 
 function NSET(nodes, name)
 
@@ -343,7 +551,7 @@ function NSET(nodes, name)
 
     if residual != 0.0
 
-        index = findfirst(" 0,", lines[end])[1]
+        index = findfirst(" 0", lines[end])[1]
         lines[end] = lines[end][1:index - 7]
 
     end
@@ -353,6 +561,51 @@ function NSET(nodes, name)
 end
 
 
+function NSET(name, nset_names::Vector{String})
+
+    #Define number of groups in set.
+    num_sets=size(nset_names)[1]
+
+    #Figure out the number of rows in the set.
+    residual = num_sets/4 - floor(Int, num_sets/4)
+
+    if residual == 0.0
+
+        num_rows = floor(Int, num_sets/4)
+
+    else
+
+        num_rows = floor(Int, num_sets/4) + 1
+        nset_names = [nset_names; fill("", 4 - (num_sets - (num_rows - 1) * 4))]
+
+    end
+
+    lines = "*Nset, nset=" * name
+
+    for i=1:num_rows
+
+        #Define the node list formatting.
+        fmt = "{:s},{:s},{:s},{:s}"
+
+        range_start = (i-1) * 4 + 1
+        range_end = i * 4  
+        range = range_start:range_end
+
+        lines = [lines; format(fmt, nset_names[range[1]], nset_names[range[2]], nset_names[range[3]], nset_names[range[4]])]
+
+    end
+
+
+    # if residual != 0.0
+
+    #     index = findfirst("", lines[end])[1]
+    #     lines[end] = lines[end][1:index - 7]
+
+    # end
+        
+    return lines
+
+end
 
 
 
@@ -435,6 +688,12 @@ function RIGID_BODY(ref_node, pin_or_tie, nset_name)
 
 end
 
+function RIGID_BODY(ref_node::String, pin_or_tie, nset_name)
+
+    lines = "*Rigid Body, ref node=" * ref_node * ", " * pin_or_tie * " nset=" * nset_name
+
+end
+
 function SHELL_SECTION(elset_name, material_name, offset, t, num_integration_points)
 
     start_line = "*Shell Section, elset=" * elset_name * ", material=" * material_name * ", offset=" 
@@ -466,7 +725,7 @@ function STATIC(stabilize, allsdtol, continue_flag, initial_time_increment, step
 end
 
 
-function STEP(name, nlgeom, inc)
+function STEP(name, nlgeom, inc::Int)
 
     fmt = "*Step, name={:s}, nlgeom={:s}, inc={:d16}"
 
@@ -474,12 +733,32 @@ function STEP(name, nlgeom, inc)
 
 end
 
+function STEP(name, nlgeom, perturbation::String)
+
+    fmt = "*Step, name={:s}, nlgeom={:s}, {:s}"
+
+    lines = format(fmt, name, nlgeom, perturbation)
+
+end
+
+
+function SURFACE_BEHAVIOR(pressure_overclosure)
+
+    fmt = "*Surface Behavior, pressure-overclosure={:s}"
+    lines = format(fmt, pressure_overclosure)
+
+    return lines
+
+end
+
 
 function SURFACE_INTERACTION(name, surface_out_of_plane_thickness)
 
-    lines = "*Surface Interaction, " * name
+    # lines = "*Surface Interaction, " * name
 
-    fmt = "{:7.5f}"
+    lines = @sprintf("*Surface Interaction, name=\"%s\"", name)
+
+    fmt = "{:7.5f},"
 
     lines = [lines; format(fmt, surface_out_of_plane_thickness)]
 

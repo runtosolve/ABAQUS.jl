@@ -9,4 +9,7 @@ using .Mesh
 include("IO.jl")
 using .IO
 
+include("Scripts.jl")
+using .Scripts
+
 end # module ABAQUS
