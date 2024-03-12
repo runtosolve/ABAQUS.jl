@@ -28,9 +28,22 @@ function parse_nodal_output(data_lines, data_width)
 end
 
 
-function get_nodal_output(lines, step_number, search_names, line_offsets, data_width)
+function get_number_of_steps_in_analysis(lines, result_type)
 
-    data_type_search_name = "N O D E   O U T P U T"
+    # "N O D E   O U T P U T"
+    data_type_search_name = result_type
+    step_line_numbers = ReadWriteFind.find_phrase_in_string_chunk(lines, data_type_search_name)
+    num_steps = length(step_line_numbers)
+
+    return num_steps
+
+end
+
+
+function get_nodal_output(lines, step_number, search_names, line_offsets, data_width, result_type)
+
+    # "N O D E   O U T P U T"
+    data_type_search_name = result_type
     step_line_numbers = ReadWriteFind.find_phrase_in_string_chunk(lines, data_type_search_name)
 
     string_chunk = lines[step_line_numbers[step_number]:end]

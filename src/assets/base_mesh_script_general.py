@@ -4,7 +4,7 @@ from abaqus import *
 from abaqusConstants import *
 import __main__
 
-def MeshCFSCB(stp_filename, job_name, part_name, instance_name):
+def MeshPart(stp_filename, job_name, part_name, instance_name):
     import section
     import regionToolset
     import displayGroupMdbToolset as dgm
