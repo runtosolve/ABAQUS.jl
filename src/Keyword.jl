@@ -105,6 +105,21 @@ function CONNECTOR_SECTION(elset, behavior, coordinate_system)
 
 end
 
+
+function CONNECTOR_SECTION(elset, coordinate_system)
+
+    fmt = "*Connector Section, elset={:s}"
+    lines = format(fmt, elset)
+
+    fmt = "{:s},"
+    lines = [lines; format(fmt, coordinate_system)]
+
+    return lines
+
+end
+
+
+
 function CONTACT()
 
     lines = "*Contact"
@@ -145,16 +160,30 @@ function CONTROLS_RESET()
 
 end
 
-function CONTROLS_FIELD(displacement_tolerance, rotation_tolerance)
+# function CONTROLS_FIELD(displacement_tolerance, rotation_tolerance)
 
-        lines = "*Controls, parameters=field, field=displacement"
+#         lines = "*Controls, parameters=field, field=displacement"
         
-        fmt = "{:9.5f}, {:9.5f}, , , , , ,"
-        lines = [lines; format(fmt, displacement_tolerance, rotation_tolerance)]
+#         fmt = "{:9.5f}, {:9.5f}, , , , , ,"
+#         lines = [lines; format(fmt, displacement_tolerance, rotation_tolerance)]
     
-    return lines 
+#     return lines 
+
+# end
+
+
+function CONTROLS_FIELD(residual_tolerance, correction_tolerance, field_type)
+
+    fmt = "*Controls, parameters=field, field={:s}"
+    lines = format(fmt, field_type)
+    
+    fmt = "{:9.5f}, {:9.5f}, , , , , ,"
+    lines = [lines; format(fmt, residual_tolerance, correction_tolerance)]
+
+return lines 
 
 end
+
 
 
 function CONTROLS_LINE_SEARCH(num_iterations)
@@ -370,9 +399,12 @@ end
 
 function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, radius_of_influence, projection_direction)
 
-    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s}, adjust orientation={:s},"
+    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s},"
 
-    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation)
+    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method)
+
+    fmt = "adjust orientation={:s},"
+    lines = [lines; format(fmt, adjust_orientation)]
 
     fmt = "number of layers={:2d},"
     lines = [lines; format(fmt, number_of_layers)]
