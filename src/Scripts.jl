@@ -3,7 +3,7 @@ module Scripts
 using ReadWriteFind
 
 
-function generate_shell_mesh_from_stp_file(stp_source_path, stp_source_filename, job_name, save_path)
+function generate_shell_mesh_from_stp_file(stp_source_path, stp_source_filename, job_name, save_path, stp_stitch_tolerance)
 
     function_file_source = joinpath(@__DIR__, "assets/base_mesh_script_general.py")
 
@@ -14,7 +14,7 @@ function generate_shell_mesh_from_stp_file(stp_source_path, stp_source_filename,
 
     stp_filename = joinpath(stp_source_path, stp_source_filename)
 
-    call_lines = ["stp_filename = '$stp_filename'"; "job_name = '$job_name'"; "part_name = '$part_name'"; "instance_name = '$instance_name'"; "MeshPart(stp_filename, job_name, part_name, instance_name)"]
+    call_lines = ["stp_filename = '$stp_filename'"; "job_name = '$job_name'"; "part_name = '$part_name'"; "instance_name = '$instance_name'"; "stp_stitch_tolerance = $stp_stitch_tolerance"; "MeshPart(stp_filename, job_name, part_name, instance_name, stp_stitch_tolerance)"]
 
     lines = [function_lines; call_lines]
 

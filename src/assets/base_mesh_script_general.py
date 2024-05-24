@@ -4,7 +4,7 @@ from abaqus import *
 from abaqusConstants import *
 import __main__
 
-def MeshPart(stp_filename, job_name, part_name, instance_name):
+def MeshPart(stp_filename, job_name, part_name, instance_name, stp_stitch_tolerance):
     import section
     import regionToolset
     import displayGroupMdbToolset as dgm
@@ -31,7 +31,7 @@ def MeshPart(stp_filename, job_name, part_name, instance_name):
         stp_filename, 
         scaleFromFile=OFF)
     mdb.models['Model-1'].PartFromGeometryFile(name=part_name, 
-        geometryFile=step, combine=True, dimensionality=THREE_D, 
+        geometryFile=step, combine=True, stitchTolerance=stp_stitch_tolerance, dimensionality=THREE_D, 
         type=DEFORMABLE_BODY)
     p = mdb.models['Model-1'].parts[part_name]
     session.viewports['Viewport: 1'].setValues(displayedObject=p)

@@ -36,6 +36,26 @@ function BOUNDARY(node::Int, degrees_of_freedom)
 
 end
 
+function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude)
+
+    lines = "*Boundary"
+
+    # fmt = "{:s}, {:d2},  , {:9.3f}"
+    fmt = "%s, %o,  , %9.3f"
+    
+
+    for i in eachindex(degrees_of_freedom)
+
+        # lines = [lines; format(fmt, node_set_name, degrees_of_freedom[i], displacement_magnitude)]
+        lines = [lines; @sprintf "%s, %o,  , %9.3f" node_set_name  degrees_of_freedom[i]  displacement_magnitude]
+
+
+    end
+
+    return lines
+
+end
+
 
 
 
@@ -770,6 +790,14 @@ function STEP(name, nlgeom, perturbation::String)
     fmt = "*Step, name={:s}, nlgeom={:s}, {:s}"
 
     lines = format(fmt, name, nlgeom, perturbation)
+
+end
+
+function STEP(name, nlgeom, inc::Int, convert_SDI)
+
+    fmt = "*Step, name={:s}, nlgeom={:s}, inc={:d16}, convert SDI={:s}"
+
+    lines = format(fmt, name, nlgeom, inc, convert_SDI)
 
 end
 
