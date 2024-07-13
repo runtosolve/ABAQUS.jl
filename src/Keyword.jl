@@ -483,18 +483,50 @@ end
 
 
 function INSTANCE(instance_name, part_name, offset_coordinates)
+    
+    lines = @sprintf "*Instance, name=%s, part=%s" instance_name part_name
 
-    fmt = "*Instance, name={:s}, part={:s}"
-    lines = format(fmt, instance_name, part_name)
-
-    fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
-    lines = [lines; format(fmt, offset_coordinates[1], offset_coordinates[2], offset_coordinates[3])]
+    lines = [lines; @sprintf "%7.4f, %7.4f, %7.4f" offset_coordinates[1] offset_coordinates[2] offset_coordinates[3]]
 
     lines = [lines; "*End Instance"]
+ 
+
+    # fmt = "*Instance, name={:s}, part={:s}"
+    # lines = format(fmt, instance_name, part_name)
+
+    # fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
+    # lines = [lines; format(fmt, offset_coordinates[1], offset_coordinates[2], offset_coordinates[3])]
+
+    # lines = [lines; "*End Instance"]
 
     return lines
 
 end
+
+
+function INSTANCE(instance_name, part_name, offset_coordinates, point_a_coordinates, point_b_coordinates, rotation_angle_a_b)
+
+    lines = @sprintf "*Instance, name=%s, part=%s" instance_name part_name
+
+    lines = [lines; @sprintf "%7.4f, %7.4f, %7.4f" offset_coordinates[1] offset_coordinates[2] offset_coordinates[3]]
+
+    lines = [lines; @sprintf "%7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f, %7.4f" point_a_coordinates[1] point_a_coordinates[2] point_a_coordinates[3] point_b_coordinates[1] point_b_coordinates[2] point_b_coordinates[3] rotation_angle_a_b]
+
+    lines = [lines; "*End Instance"]
+ 
+
+    # fmt = "*Instance, name={:s}, part={:s}"
+    # lines = format(fmt, instance_name, part_name)
+
+    # fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
+    # lines = [lines; format(fmt, offset_coordinates[1], offset_coordinates[2], offset_coordinates[3])]
+
+    # lines = [lines; "*End Instance"]
+
+    return lines
+
+end
+
 
 
 function MATERIAL(name)
