@@ -252,25 +252,44 @@ function ELEMENT(elements, type, nodes_per_element)
 
     if nodes_per_element == 4
 
-        fmt = "{:7d},{:7d},{:7d},{:7d},{:7d}"
+        # fmt = "{:7d},{:7d},{:7d},{:7d},{:7d}"
 
         lines[1] = "*Element, type=" * type
 
         for i=1:size(elements)[1]
 
-            lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4],
-                                elements[i,5])
+            # lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4],
+            #                     elements[i,5])
+            lines[i+1] = @sprintf "%7d,%7d,%7d,%7d,%7d" elements[i,1] elements[i,2] elements[i,3] elements[i,4] elements[i,5]
+            #                  
         end
 
     elseif nodes_per_element == 3
 
-        fmt = "{:7d},{:7d},{:7d},{:7d}"
+        # fmt = "{:7d},{:7d},{:7d},{:7d}"
 
         lines[1] = "*Element, type=" * type
 
         for i=1:size(elements)[1]
 
-            lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4])
+            # lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4])
+   
+            lines[i+1] = @sprintf "%7d,%7d,%7d,%7d" elements[i,1] elements[i,2] elements[i,3] elements[i,4]
+                           
+        end
+
+    elseif nodes_per_element == 8
+
+        # fmt = "{:7d},{:7d},{:7d},{:7d},{:7d}{:7d}{:7d}{:7d}{:7d}"
+
+        lines[1] = "*Element, type=" * type
+
+        for i=1:size(elements)[1]
+
+            # lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4],
+                                # elements[i,5], elements[i,6], elements[i,7], elements[i,8], elements[i,9])
+            lines[i+1] = @sprintf "%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d" elements[i,1] elements[i,2] elements[i,3] elements[i,4] elements[i,5] elements[i,6] elements[i,7] elements[i,8] elements[i,9]
+                           
         end
 
     end
@@ -793,6 +812,14 @@ function SHELL_SECTION(elset_name, material_name, offset, t, num_integration_poi
     fmt = "{:7.4f},{:2d}"
     lines = [lines; format(fmt, t, num_integration_points)]
 
+    return lines
+
+end
+
+function SOLID_SECTION(elset_name, material_name)
+
+    lines = "*Solid Section, elset=" * elset_name * ", material=" * material_name
+    
     return lines
 
 end
