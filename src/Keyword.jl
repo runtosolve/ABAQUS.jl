@@ -230,6 +230,31 @@ function DENSITY(ρ)
 
 end
 
+
+function DLOAD(element_set_name, degree_of_freedom, magnitude)
+
+    lines = "*Dload"
+
+    fmt = "{:s}, {:d2}, {:7.4f}"
+
+    lines = [lines; format(fmt, node_set_name, degree_of_freedom, magnitude)]
+
+    return lines
+
+end
+
+
+function DSLOAD(follower, constant_resultant, surface_name, load_type, load_magnitude, load_direction)
+
+    lines = @sprintf "*Dsload, follower=%s, constant resultant=%s" follower constant_resultant
+    lines = [lines; @sprintf "%s, %s, %7.4f, %7.4f, %7.4f, %7.4f" surface_name load_type load_magnitude load_direction[1] load_direction[2] load_direction[3]]
+
+    return lines
+
+end
+
+
+
 function ELASTIC(E, ν)
 
     fmt = "{:9.6f}, {:9.6f}"
@@ -857,6 +882,15 @@ function STEP(name, nlgeom, inc::Int, convert_SDI)
     fmt = "*Step, name={:s}, nlgeom={:s}, inc={:d16}, convert SDI={:s}"
 
     lines = format(fmt, name, nlgeom, inc, convert_SDI)
+
+end
+
+function SURFACE(surface_type, surface_name, elset_name, surface_face)
+
+    lines = @sprintf "*Surface, type=%s, name=%s" surface_type surface_name
+    lines = [lines; @sprintf "%s, %s" elset_name surface_face]
+
+    return lines
 
 end
 
