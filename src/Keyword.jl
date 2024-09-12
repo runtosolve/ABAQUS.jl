@@ -192,6 +192,17 @@ end
 # end
 
 
+function CONTROLS_CONSTRAINTS(Tvol, Taxial, Ttshear, Tcont, Tsoft, Tdisp, Trot, Tcfe)
+
+    lines = "*Controls, parameters=constraints"
+
+    lines = [lines; @sprintf "%9.5f, %9.5f, %9.5f, %9.5f, %9.5f, %9.5f, %9.5f, %9.5f" Tvol Taxial Ttshear Tcont Tsoft Tdisp Trot Tcfe]
+
+return lines 
+
+end
+
+
 function CONTROLS_FIELD(residual_tolerance, correction_tolerance, field_type)
 
     fmt = "*Controls, parameters=field, field={:s}"
@@ -248,6 +259,16 @@ function DSLOAD(follower, constant_resultant, surface_name, load_type, load_magn
 
     lines = @sprintf "*Dsload, follower=%s, constant resultant=%s" follower constant_resultant
     lines = [lines; @sprintf "%s, %s, %7.4f, %7.4f, %7.4f, %7.4f" surface_name load_type load_magnitude load_direction[1] load_direction[2] load_direction[3]]
+
+    return lines
+
+end
+
+
+function DSLOAD(surface_name, load_type, load_magnitude)
+
+    lines = @sprintf "*Dsload"
+    lines = [lines; @sprintf "%s, %s, %7.4f" surface_name load_type load_magnitude]
 
     return lines
 
@@ -314,6 +335,20 @@ function ELEMENT(elements, type, nodes_per_element)
             # lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4],
                                 # elements[i,5], elements[i,6], elements[i,7], elements[i,8], elements[i,9])
             lines[i+1] = @sprintf "%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d" elements[i,1] elements[i,2] elements[i,3] elements[i,4] elements[i,5] elements[i,6] elements[i,7] elements[i,8] elements[i,9]
+                           
+        end
+
+    elseif nodes_per_element == 10
+
+        # fmt = "{:7d},{:7d},{:7d},{:7d},{:7d}{:7d}{:7d}{:7d}{:7d}"
+
+        lines[1] = "*Element, type=" * type
+
+        for i=1:size(elements)[1]
+
+            # lines[i+1] = format(fmt, elements[i,1], elements[i,2], elements[i,3], elements[i,4],
+                                # elements[i,5], elements[i,6], elements[i,7], elements[i,8], elements[i,9])
+            lines[i+1] = @sprintf "%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d,%7d" elements[i,1] elements[i,2] elements[i,3] elements[i,4] elements[i,5] elements[i,6] elements[i,7] elements[i,8] elements[i,9] elements[i,10] elements[i,11]
                            
         end
 
