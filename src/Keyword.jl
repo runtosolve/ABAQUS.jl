@@ -71,10 +71,31 @@ function BUCKLE(num_modes, max_eigenvalue, num_vectors, max_iterations)
         lines = [lines; format(fmt, num_modes, max_eigenvalue, num_vectors, max_iterations)]
     end
 
+    return lines
+
+end
+
+
+
+function BUCKLE(num_modes, min_eigenvalue, max_eigenvalue, block_size, max_num_block_steps)
+
+    lines = "*Buckle, eigensolver=LANCZOS" 
+
+    if isempty(block_size)
+        lines = [lines; @sprintf "%o, %9.5f, %9.5f, ," num_modes min_eigenvalue max_eigenvalue]
+    else
+        lines = [lines; @sprintf "%o, %9.5f, %9.5f, %9.5f, %o" num_modes min_eigenvalue max_eigenvalue block_size max_num_block_steps]
+    end
+
+    # lines = [lines; line]
 
     return lines
 
 end
+
+
+
+
 
 
 function CLOAD(node_set_name, degree_of_freedom, magnitude)
