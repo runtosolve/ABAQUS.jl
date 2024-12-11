@@ -167,15 +167,65 @@ function CONTACT()
 
 end
 
-function CONTACT_INCLUSIONS(all_exterior)
+
+function CONTACT_CONTROLS(field_type, magnitude)
+
+    fmt = "*Controls, parameters=field, field={:s}"
+    lines = format(fmt, field_type)
+    
+    fmt = "{:9.5f}, {:9.5f}, , , , , ,"
+    lines = [lines; format(fmt, residual_tolerance, correction_tolerance)]
+
+return lines 
+
+end
+
+
+function CONTACT_INCLUSIONS(all_exterior, surface_pairs)
 
     if all_exterior == true
 
         lines = "*Contact Inclusions, ALL EXTERIOR"
 
+    else
+
+        lines = "*Contact Inclusions"
+
+        for i in eachindex(surface_pairs)
+            lines = [lines; @sprintf "%s, %s" surface_pairs[i][1] surface_pairs[i][2]]
+        end
+
     end
 
     return lines
+
+end
+
+
+
+
+
+
+function CONTACT_INITIALIZATION_ASSIGNMENT(surface_pairs, initialization_name)
+
+
+        lines = "*Contact Initialization Assignment"
+
+        for i in eachindex(surface_pairs)
+            lines = [lines; @sprintf "%s, %s, %s" surface_pairs[i][1] surface_pairs[i][2] initialization_name[i]]
+        end
+
+
+    return lines
+
+end
+
+
+
+
+function CONTACT_INITIALIZATION_DATA(name, search_above, search_below)
+
+    lines = @sprintf("*Contact Initialization Data, name=%s, SEARCH ABOVE=%9.5f, SEARCH BELOW=%9.5f", name, search_above, search_below)
 
 end
 
@@ -193,6 +243,18 @@ function CONTACT_PROPERTY_ASSIGNMENT(surface_name_1, surface_name_2, surface_int
     return lines
 
 end
+
+
+function CONTACT_STABILIZATION(surface_pair)
+
+    lines = "*Contact Stabilization"
+
+    lines = [lines; @sprintf "%s, %s" surface_pair[1] surface_pair[2]]
+
+return lines
+
+end
+
 
 
 function CONTROLS_RESET()
@@ -245,9 +307,19 @@ function CONTROLS_LINE_SEARCH(num_iterations)
     fmt = "{:d2}, , , ,"
     lines = [lines; format(fmt, num_iterations)]
 
-return lines 
+    return lines 
 
 end
+
+function CONTROLS_TIME_INCREMENTATION(attempts_per_increment)
+
+    lines = "*Controls, parameters=TIME INCREMENTATION"
+    lines = [lines; @sprintf ", , , , , , , %2d" attempts_per_increment]
+
+    return lines 
+
+end
+
 
 
 function DENSITY(ρ)
@@ -276,6 +348,18 @@ function DLOAD(element_set_name, degree_of_freedom, magnitude)
 end
 
 
+function DLOAD_GRAV(acceleration_magnitude, acceleration_direction)
+
+    lines = "*Dload"
+
+    lines = [lines; @sprintf ", GRAV, %7.4f, %7.4f, %7.4f, %7.4f" acceleration_magnitude acceleration_direction[1] acceleration_direction[2] acceleration_direction[3]]
+
+    return lines
+
+end
+
+
+
 function DSLOAD(follower, constant_resultant, surface_name, load_type, load_magnitude, load_direction)
 
     lines = @sprintf "*Dsload, follower=%s, constant resultant=%s" follower constant_resultant
@@ -295,6 +379,33 @@ function DSLOAD(surface_name, load_type, load_magnitude)
 
 end
 
+function DYNAMIC(application, initial_time_increment, step_time_period, minimum_time_increment, maximum_time_increment)
+
+        lines = @sprintf "*Dynamic, application=%s" application
+        lines = [lines; @sprintf "%7.4f, %7.4f, %e, %7.4f" initial_time_increment step_time_period minimum_time_increment maximum_time_increment]
+    
+    return lines 
+
+end   
+
+function DYNAMIC_EXPLICIT(step_time_period, maximum_time_increment)
+
+    lines = "*Dynamic, explicit" 
+    lines = [lines; @sprintf ", %7.4f, , %7.4f" step_time_period maximum_time_increment]
+
+return lines 
+
+end   
+
+
+function EL_FILE(elset, variable)
+
+    lines = @sprintf "*El File, elset =%s" elset 
+    lines = [lines; @sprintf "%s" variable]
+
+    return lines 
+
+end
 
 
 function ELASTIC(E, ν)
@@ -309,7 +420,19 @@ function ELASTIC(E, ν)
 
 end
 
+function ELEMENT_SPRING(elements, type, elset)
 
+    lines = @sprintf "*Element, type= %s, elset= %s" type elset
+
+    for i=1:size(elements)[1]
+
+        lines = [lines; @sprintf "%1d, %s" elements[i, 1] elements[i, 2] ]
+
+    end
+
+    return lines
+
+end
 
 
 #need to add multiple dispatch here to cover other element types
@@ -557,6 +680,18 @@ function FRICTION(slip_tolerance, friction_coeff)
 
     fmt = "*Friction, slip tolerance={:7.5f}"
     lines = format(fmt, slip_tolerance)
+    
+    fmt = "{:7.5f},"
+    lines = [lines; format(fmt, friction_coeff)]
+
+    return lines
+
+end
+
+
+function FRICTION(friction_coeff)
+
+    lines = "*Friction"
     
     fmt = "{:7.5f},"
     lines = [lines; format(fmt, friction_coeff)]
@@ -906,6 +1041,39 @@ function SOLID_SECTION(elset_name, material_name)
 end
 
 
+function SPRING(elset, dof, stiffness)
+
+    lines = @sprintf "*Spring, elset= %s" elset
+    lines = [lines; @sprintf "%1d" dof]
+    lines = [lines; @sprintf "%7.4f" stiffness]
+
+    return lines 
+
+end
+
+# function STATIC(stabilize, allsdtol, continue_flag, initial_time_increment, step_time_period, minimum_time_increment, maximum_time_increment)
+
+#     if stabilize == true
+
+#         fmt = "*Static, stabilize"
+#         lines = format(fmt, stabilize, allsdtol, continue_flag)
+
+#         fmt = "{:7.4f},{:7.4f}, {:7.4E},{:7.4f}"
+#         lines = [lines; format(fmt, initial_time_increment, step_time_period, minimum_time_increment, maximum_time_increment)]
+    
+#     else
+
+#         fmt = "*Static, stabilize={:7.5f}, allsdtol={:7.5f}, continue={:s}"
+#         lines = format(fmt, stabilize, allsdtol, continue_flag)
+
+#         fmt = "{:7.4f},{:7.4f}, {:7.4E},{:7.4f}"
+#         lines = [lines; format(fmt, initial_time_increment, step_time_period, minimum_time_increment, maximum_time_increment)]
+
+#     end
+
+# end
+
+
 function STATIC(stabilize, allsdtol, continue_flag, initial_time_increment, step_time_period, minimum_time_increment, maximum_time_increment)
 
     fmt = "*Static, stabilize={:7.5f}, allsdtol={:7.5f}, continue={:s}"
@@ -915,6 +1083,9 @@ function STATIC(stabilize, allsdtol, continue_flag, initial_time_increment, step
     lines = [lines; format(fmt, initial_time_increment, step_time_period, minimum_time_increment, maximum_time_increment)]
 
 end
+
+
+
 
 
 function STEP(name, nlgeom, inc::Int)
@@ -940,6 +1111,13 @@ function STEP(name, nlgeom, inc::Int, convert_SDI)
     lines = format(fmt, name, nlgeom, inc, convert_SDI)
 
 end
+
+function STEP(name, nlgeom)
+
+    lines = @sprintf "*Step, name=%s, nlgeom=%s" name   nlgeom
+
+end
+
 
 function SURFACE(surface_type, surface_name, elset_name, surface_face)
 
