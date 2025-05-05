@@ -3,7 +3,7 @@ module Scripts
 using ReadWriteFind
 
 
-function generate_shell_mesh_from_stp_file(stp_source_path, stp_source_filename, job_name, save_path, seed_size, stp_stitch_tolerance)
+function generate_shell_mesh_from_stp_file(stp_source_path, stp_source_filename, job_name, save_path, seed_size, stp_stitch_tolerance, maximum_deviation_factor, minimum_size_control_fraction)
 
     function_file_source = joinpath(@__DIR__, "assets/base_mesh_script_general.py")
 
@@ -14,7 +14,7 @@ function generate_shell_mesh_from_stp_file(stp_source_path, stp_source_filename,
 
     stp_filename = joinpath(stp_source_path, stp_source_filename)
 
-    call_lines = ["stp_filename = '$stp_filename'"; "job_name = '$job_name'"; "part_name = '$part_name'"; "instance_name = '$instance_name'"; "seed_size = $seed_size"; "stp_stitch_tolerance = $stp_stitch_tolerance"; "MeshPart(stp_filename, job_name, part_name, instance_name, seed_size, stp_stitch_tolerance)"]
+    call_lines = ["stp_filename = '$stp_filename'"; "job_name = '$job_name'"; "part_name = '$part_name'"; "instance_name = '$instance_name'"; "seed_size = $seed_size"; "stp_stitch_tolerance = $stp_stitch_tolerance"; "maximum_deviation_factor = $maximum_deviation_factor"; "minimum_size_control_fraction = $minimum_size_control_fraction"; "MeshPart(stp_filename, job_name, part_name, instance_name, seed_size, stp_stitch_tolerance, maximum_deviation_factor, minimum_size_control_fraction)"]
 
     lines = [function_lines; call_lines]
 
@@ -43,6 +43,20 @@ function grab_connector_forces_from_odb(odb_source_path, odb_source_filename, ou
 end
 
 
+function write_mesh_bash_script(all_filenames, script_filename)
+
+    lines = []
+
+    for i in eachindex(all_filenames)
+
+        push!(lines, "abaqus cae noGUI=" * all_filenames[i][1:end-2] * ".py")
+
+    end
+
+    filename = joinpath(@__DIR__, script_filename)
+    ReadWriteFind.write_file(filename, lines)
+
+end
 
 
 end  #module

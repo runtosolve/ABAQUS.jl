@@ -1,0 +1,21 @@
+
+abaqus cae noGUI=CB18-100_SE.stp
+abaqus cae noGUI=CB18-125_SE.stp
+abaqus cae noGUI=CB21-100_SE.stp
+abaqus cae noGUI=CB21-125_SE.stp
+abaqus cae noGUI=CB24-100_SE.stp
+abaqus cae noGUI=CB24-125_SE.stp
+abaqus cae noGUI=CB27-100_SE.stp
+abaqus cae noGUI=CB27-125_SE.stp
+abaqus cae noGUI=CB30-100_SE.stp
+abaqus cae noGUI=CB30-125_SE.stp
+abaqus cae noGUI=CB33-100_SE.stp
+abaqus cae noGUI=CB33-125_SE.stp
+abaqus cae noGUI=SB12-100_SE.stp
+abaqus cae noGUI=SB12-125_SE.stp
+abaqus cae noGUI=SB14-100_SE.stp
+abaqus cae noGUI=SB14-125_SE.stp
+abaqus cae noGUI=SB16-100_SE.stp
+abaqus cae noGUI=SB16-125_SE.stp
+abaqus cae noGUI=SB18-100_SE.stp
+abaqus cae noGUI=SB18-125_SE.stp

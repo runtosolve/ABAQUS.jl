@@ -168,7 +168,7 @@ function CONTACT()
 end
 
 
-function CONTACT_CONTROLS(field_type, magnitude)
+function CONTROLS(field_type)
 
     fmt = "*Controls, parameters=field, field={:s}"
     lines = format(fmt, field_type)
@@ -176,6 +176,14 @@ function CONTACT_CONTROLS(field_type, magnitude)
     fmt = "{:9.5f}, {:9.5f}, , , , , ,"
     lines = [lines; format(fmt, residual_tolerance, correction_tolerance)]
 
+return lines 
+
+end
+
+function CONTACT_CONTROLS(parameter)
+
+    lines = @sprintf "*Contact Controls, %s" parameter
+    
 return lines 
 
 end
@@ -249,7 +257,9 @@ function CONTACT_STABILIZATION(surface_pair)
 
     lines = "*Contact Stabilization"
 
-    lines = [lines; @sprintf "%s, %s" surface_pair[1] surface_pair[2]]
+    if !isempty(surface_pair)
+        lines = [lines; @sprintf "%s, %s" surface_pair[1] surface_pair[2]]
+    end
 
 return lines
 

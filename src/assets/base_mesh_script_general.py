@@ -4,7 +4,7 @@ from abaqus import *
 from abaqusConstants import *
 import __main__
 
-def MeshPart(stp_filename, job_name, part_name, instance_name, seed_size, stp_stitch_tolerance):
+def MeshPart(stp_filename, job_name, part_name, instance_name, seed_size, stp_stitch_tolerance, maximum_deviation_factor, minimum_size_control_fraction):
     import section
     import regionToolset
     import displayGroupMdbToolset as dgm
@@ -41,7 +41,7 @@ def MeshPart(stp_filename, job_name, part_name, instance_name, seed_size, stp_st
     session.viewports['Viewport: 1'].partDisplay.geometryOptions.setValues(
         referenceRepresentation=OFF)
     p = mdb.models['Model-1'].parts[part_name]
-    p.seedPart(size=seed_size, deviationFactor=0.5, minSizeFactor=0.5)
+    p.seedPart(size=seed_size, deviationFactor=maximum_deviation_factor, minSizeFactor=minimum_size_control_fraction)
     p = mdb.models['Model-1'].parts[part_name]
     p.generateMesh()
     a = mdb.models['Model-1'].rootAssembly
