@@ -119,6 +119,24 @@ function get_step_load_ratios(filename, file_path)
 
 end
 
+function get_buckling_loads_from_dat(file_path, filename)
 
+    lines = ReadWriteFind.read_text_file(joinpath(file_path, filename))
+
+    target_string = "E I G E N V A L U E    O U T P U T "
+    line_index = ReadWriteFind.find_target_line_in_text_file(target_string, lines)
+
+    lines = lines[line_index:end]
+
+    target_string = "                    E I G E N V A L U E    N U M B E R     1"
+    line_index = ReadWriteFind.find_target_line_in_text_file(target_string, lines)
+
+    lines = lines[11:line_index-5]
+
+    buckling_loads = [parse(Float64, split(lines[i])[2]) for i in eachindex(lines)]
+
+    return buckling_loads 
+
+end
 
 end #module
