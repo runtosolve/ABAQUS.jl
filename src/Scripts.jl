@@ -1,6 +1,6 @@
 module Scripts
 
-using ReadWriteFind
+using ReadWriteFind, Printf
 
 
 function generate_shell_mesh_from_stp_file(stp_source_path, stp_source_filename, job_name, save_path, seed_size, stp_stitch_tolerance, maximum_deviation_factor, minimum_size_control_fraction)
@@ -55,6 +55,38 @@ function write_mesh_bash_script(all_filenames, script_filename)
 
     filename = joinpath(@__DIR__, script_filename)
     ReadWriteFind.write_file(filename, lines)
+
+end
+
+
+function write_ding_connector_uel_f_file(save_path, filename, uel_output_path, KPNT, KSEC, KORIENT, KOUTPUT)
+    
+    function_file_source = joinpath(@__DIR__, "assets/DING_connector_UEL.f")
+
+    lines = ReadWriteFind.read_text_file(function_file_source)
+
+    target_string = "PARAMETER (FILEPATH"
+    index = ReadWriteFind.find_target_line_in_text_file(target_string, lines)
+    lines[index] = "      PARAMETER (FILEPATH = '$uel_output_path')"
+
+    target_string = "KPNT = 3"
+    index = ReadWriteFind.find_target_line_in_text_file(target_string, lines)
+    lines[index] = @sprintf"      KPNT = %s" string(KPNT)
+
+    target_string = "KSEC = 0"
+    index = ReadWriteFind.find_target_line_in_text_file(target_string, lines)
+    lines[index] = @sprintf"      KSEC = %s" string(KSEC)
+
+    target_string = "KORIENT = 1"
+    index = ReadWriteFind.find_target_line_in_text_file(target_string, lines)
+    lines[index] = @sprintf"      KORIENT = %s" string(KORIENT)
+
+    target_string = "KOUTPUT = 1"
+    index = ReadWriteFind.find_target_line_in_text_file(target_string, lines)
+    lines[index] = @sprintf"      KOUTPUT = %s" string(KOUTPUT)
+
+    save_filename = joinpath(save_path, filename)
+    ReadWriteFind.write_file(save_filename, lines)
 
 end
 

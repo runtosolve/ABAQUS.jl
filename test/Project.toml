@@ -1,3 +1,4 @@
 [deps]
 ABAQUS = "3de819fd-b07e-4939-9fde-f678daf6906b"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+ReadWriteFind = "6e1ff3fe-52ba-4718-9baa-43b124cc059a"
