@@ -91,4 +91,20 @@ function write_ding_connector_uel_f_file(save_path, filename, uel_output_path, K
 end
 
 
+function write_update_inp_macro(model_name, model_remote_path_and_filename, save_path, save_filename)
+
+    function_file_source = joinpath(@__DIR__, "assets/update_inp_file.py")
+
+    lines = ReadWriteFind.read_text_file(function_file_source)
+
+
+    call_lines = ["model_name = '$model_name'"; "path_with_filename = '$model_remote_path_and_filename'"; "updateinp(model_name, path_with_filename)"]
+
+    lines = [lines; call_lines]
+
+    save_path_and_filename = joinpath(save_path, save_filename)
+    ReadWriteFind.write_file(save_path_and_filename, lines)
+
+end
+
 end  #module

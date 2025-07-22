@@ -111,6 +111,17 @@ function CLOAD(node_set_name, degree_of_freedom, magnitude)
 end
 
 
+function CONN3D2(element_number, node_i, node_j)
+
+    lines = "*Element, type=CONN3D2"
+    lines = [lines; @sprintf "%d, %d, %d" element_number node_i node_j]
+    
+return lines 
+
+end
+
+
+
 function CONNECTOR_BEHAVIOR(name)
 
     fmt = "*Connector Behavior, name={:s}"
@@ -134,6 +145,19 @@ function CONNECTOR_ELASTICITY(component, magnitude)
 
 end
 
+
+function CONNECTOR_FRICTION(inputs)
+
+    lines = "*Connector Friction, predefined"
+    
+    line = @sprintf "%9.5f, %9.5f, %9.5f, %9.5f" inputs[1] inputs[2] inputs[3] inputs[4]
+    lines = [lines; line]
+
+    return lines 
+
+end
+
+
 function CONNECTOR_SECTION(elset, behavior, coordinate_system)
 
     fmt = "*Connector Section, elset={:s}, behavior={:s}"
@@ -156,6 +180,31 @@ function CONNECTOR_SECTION(elset, coordinate_system)
     lines = [lines; format(fmt, coordinate_system)]
 
     return lines
+
+end
+
+
+
+function CONNECTOR_SECTION(elset, behavior, type, orientation)
+
+    lines = @sprintf "*Connector Section, elset=%s, behavior=%s" elset behavior
+
+    line = @sprintf "%s," type 
+    lines = [lines; line]
+
+    line = @sprintf "\"%s\"," orientation
+    lines = [lines; line]
+
+    return lines
+
+end
+
+
+function CONSTRAINT_CONTROLS(print)
+
+    lines = @sprintf "*CONSTRAINT controls, print=%s" print 
+
+    return lines 
 
 end
 
@@ -478,6 +527,17 @@ function ELEMENT(elements, type, nodes_per_element)
                            
         end
 
+    elseif nodes_per_element == 2
+
+         
+        lines[1] = "*Element, type=" * type
+
+        for i=1:size(elements)[1]
+
+            lines[i+1] = @sprintf "%7d,%7d,%7d" elements[i,1] elements[i,2] elements[i,3]
+                           
+        end
+
     elseif nodes_per_element == 8
 
         # fmt = "{:7d},{:7d},{:7d},{:7d},{:7d}{:7d}{:7d}{:7d}{:7d}"
@@ -511,6 +571,56 @@ function ELEMENT(elements, type, nodes_per_element)
     return lines 
 
 end
+
+
+
+#need to add multiple dispatch here to cover other element types
+function ELEMENT(elements, type, nodes_per_element, elset_name)   
+
+    lines = Matrix{String}(undef, size(elements)[1]+1, 1)
+
+    if nodes_per_element == 2
+
+         
+        lines[1] = @sprintf "*Element, type=%s, elset=%s" type elset_name
+
+        for i=1:size(elements)[1]
+
+            lines[i+1] = @sprintf "%7d,%7d,%7d" elements[i,1] elements[i,2] elements[i,3]
+                           
+        end
+
+    end
+    
+
+    return lines 
+
+end
+
+
+#need to add multiple dispatch here to cover other element types
+function ELEMENT(element_number, node_i, node_j, type, nodes_per_element, elset_name)   
+
+    lines = Matrix{String}(undef, size(element_number)[1]+1, 1)
+
+    if nodes_per_element == 2
+
+        lines[1] = @sprintf "*Element, type=%s, elset=%s" type elset_name
+
+        for i=1:size(element_number)[1]
+
+            lines[i+1] = @sprintf "%d,%s,%s" element_number[i] node_i[i] node_j[i]
+                           
+        end
+
+    end
+    
+
+    return lines 
+
+end
+
+
 
 
 function ELEMENT_OUTPUT(directions, fields)
@@ -626,6 +736,27 @@ function EL_PRINT(variables, elset_name)
     return lines
 
 end
+
+
+function EQUATION(num_of_equations, node_label_i, dof_i, magnitude_i, node_label_j, dof_j, magnitude_j)
+    
+    lines = "*Equation"
+
+    for i in eachindex(node_label_i)
+
+        line = @sprintf "%d" num_of_equations[i]
+        lines = [lines; line]
+
+        line = @sprintf "%s, %d, %7.4f, %s, %d, %7.4f" node_label_i[i] dof_i[i] magnitude_i[i] node_label_j[i] dof_j[i] magnitude_j[i]
+        lines = [lines; line]
+
+    end
+
+    return lines
+
+end
+
+
 
 function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, search_radius, radius_of_influence, projection_direction)
 
@@ -772,6 +903,22 @@ function INSTANCE(instance_name, part_name, offset_coordinates, point_a_coordina
 
 end
 
+
+function KINEMATIC_COUPLING(ref_node, node_set_name, degrees_of_freedom)
+
+    lines = @sprintf "*Kinematic Coupling, ref node=%d" ref_node
+
+
+    for i in eachindex(degrees_of_freedom)
+
+        lines = [lines; @sprintf "%s, %o, " node_set_name  degrees_of_freedom[i] ] 
+
+
+    end
+
+    return lines
+
+end
 
 
 function MATERIAL(name)
@@ -955,6 +1102,21 @@ end
 # end
 
 
+function ORIENTATION(name, local_x_axis, local_y_axis)
+
+    lines = @sprintf "*Orientation, name=%s" name
+    
+    line = @sprintf "%9.5f, %9.5f, %9.5f, %9.5f, %9.5f, %9.5f" local_x_axis[1] local_x_axis[2] local_x_axis[3] local_y_axis[1] local_y_axis[2] local_y_axis[3]
+    lines = [lines; line]
+
+    line = @sprintf "1, 0."
+    lines = [lines; line]
+
+    return lines
+
+end
+
+
 function OUTPUT(field_or_history, variable)
 
     if isempty(variable)
@@ -1053,8 +1215,8 @@ end
 
 function SPRING(elset, dof, stiffness)
 
-    lines = @sprintf "*Spring, elset= %s" elset
-    lines = [lines; @sprintf "%1d" dof]
+    lines = @sprintf "*Spring, elset=%s" elset
+    lines = [lines; @sprintf "%1d, %1d" dof dof]
     lines = [lines; @sprintf "%7.4f" stiffness]
 
     return lines 
@@ -1160,6 +1322,102 @@ function SURFACE_INTERACTION(name, surface_out_of_plane_thickness)
     lines = [lines; format(fmt, surface_out_of_plane_thickness)]
 
     return lines
+
+end
+
+
+function UEL_PROPERTY_DING_CONNECTOR(elset, inputs, dof)
+
+    (; d,        # Displacement/strain history
+    dmgtype,  
+    strain1p,
+    strain2p,
+    strain3p,
+    strain4p,
+    strain1n,
+    strain2n,
+    strain3n,
+    strain4n,
+
+    stress1p,
+    stress2p,
+    stress3p,
+    stress4p,
+    stress1n,
+    stress2n,
+    stress3n,
+    stress4n,
+
+
+    rDispP,
+    rForceP,
+    uForceP,
+    rDispN,
+    rForceN,
+    uForceN,
+
+
+    gammaK1,
+    gammaK2,
+    gammaK3,
+    gammaK4,
+    gammaKLimit,
+
+    gammaD1,
+    gammaD2,
+    gammaD3,
+    gammaD4,
+    gammaDLimit,
+
+    gammaF1,
+    gammaF2,
+    gammaF3,
+    gammaF4,
+    gammaFLimit,
+
+    gE) = inputs
+
+    if dmgtype == "energy"
+        dmgtype_key = 0
+    elseif dmgtype == "cycle"
+        dmgtype_key = 1
+    end
+
+    lines = @sprintf "*UEL property, elset = %s" elset
+
+    line = @sprintf "%9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e" strain1p strain2p strain3p strain4p stress1p stress2p stress3p stress4p
+    lines = [lines; line]
+
+    line = @sprintf "%9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e" strain1n strain2n strain3n strain4n stress1n stress2n stress3n stress4n
+    lines = [lines; line]
+
+    line = @sprintf "%9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e" rDispP rForceP uForceP rDispN rForceN uForceN gammaK1 gammaK2
+    lines = [lines; line]
+
+    line = @sprintf "%9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e"  gammaK3 gammaK4 gammaKLimit gammaD1 gammaD2 gammaD3 gammaD4 gammaDLimit
+    lines = [lines; line]
+
+    line = @sprintf "%9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %9.6e, %d, %d"  gammaF1 gammaF2 gammaF3 gammaF4 gammaFLimit gE dmgtype_key dof[1] 
+    lines = [lines; line]
+
+     line = @sprintf "%d"  dof[2]
+    lines = [lines; line]
+
+    return lines
+
+end
+
+
+
+
+function USER_ELEMENT(num_nodes, type, properties, coordinates, variables, dof)
+
+    lines = @sprintf "*USER Element, nodes=%d, type=%s, properties=%d, coordinates=%d, variables=%d" num_nodes type properties coordinates variables
+
+    line = @sprintf "%d, %d" dof[1] dof[2]
+    lines = [lines; line]
+
+    return lines 
 
 end
 
