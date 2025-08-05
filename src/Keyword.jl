@@ -770,7 +770,7 @@ function FASTENER(name, property, reference_node_set, elset, coupling, attachmen
     fmt = "search radius={:9.5f},"
     lines = [lines; format(fmt, search_radius)]
 
-    fmt = "radius of influence={:9.5f}"
+    fmt = "radius of influence={:9.5f},"
     lines = [lines; format(fmt, radius_of_influence)]
 
     fmt = "{:7.4f}, {:7.4f}, {:7.4f}"

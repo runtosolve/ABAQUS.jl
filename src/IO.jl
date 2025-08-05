@@ -92,6 +92,7 @@ function get_step_load_ratios(filename, file_path)
         # filename = beam_name * "_" * model_type * model_version * ".sta"
 
         lines = ReadWriteFind.read_text_file(joinpath(file_path, filename))[6:end-2]
+        lines = ReadWriteFind.read_text_file(joinpath(file_path, filename))[6:end]
 
         step_numbers = []
         load_ratios = []
