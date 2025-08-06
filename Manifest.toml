@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.0"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "c8063f4917db9e6fc108309b71b834e9bbd00886"
 
@@ -12,10 +12,12 @@ version = "0.4.3"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
 
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
 
 [[deps.ReadWriteFind]]
 path = "/Users/crismoen/.julia/dev/ReadWriteFind"
@@ -24,3 +26,4 @@ version = "0.1.0"
 
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
