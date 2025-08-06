@@ -758,20 +758,20 @@ end
 
 
 
-function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, search_radius, radius_of_influence, projection_direction)
+function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, search_radius, projection_direction)
 
-    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s}, adjust orientation={:s},"
+    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s}, adjust orientation={:s}, number of layers={:2d},"
 
-    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation)
+    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers)
 
-    fmt = "number of layers={:2d},"
-    lines = [lines; format(fmt, number_of_layers)]
+    # fmt = "number of layers={:2d},"
+    # lines = [lines; format(fmt, number_of_layers)]
 
-    fmt = "search radius={:9.5f},"
+    fmt = "search radius={:9.5f}"
     lines = [lines; format(fmt, search_radius)]
 
-    fmt = "radius of influence={:9.5f},"
-    lines = [lines; format(fmt, radius_of_influence)]
+    # fmt = "radius of influence={:9.5f},"
+    # lines = [lines; format(fmt, radius_of_influence)]
 
     fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
     lines = [lines; format(fmt, projection_direction[1], projection_direction[2], projection_direction[3])]
