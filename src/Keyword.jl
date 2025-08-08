@@ -237,6 +237,18 @@ return lines
 
 end
 
+function CONTACT_CONTROLS(parameter, damping_coeff, fraction_of_damping_at_end_of_step, clearance_at_which_damping_becomes_zero)
+
+    lines = @sprintf "*Contact Controls, %s" parameter
+
+    line = @sprintf "%s, %9.5f, %9.5f" damping_coeff fraction_of_damping_at_end_of_step clearance_at_which_damping_becomes_zero
+
+    lines = [lines; line]
+    
+return lines 
+
+end
+
 
 function CONTACT_INCLUSIONS(all_exterior, surface_pairs)
 
@@ -781,27 +793,27 @@ function FASTENER(name, property, reference_node_set, elset, coupling, attachmen
 end
 
 
-function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, radius_of_influence, projection_direction)
+# function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, radius_of_influence, projection_direction)
 
-    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s},"
+#     fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s},"
 
-    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method)
+#     lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method)
 
-    fmt = "adjust orientation={:s},"
-    lines = [lines; format(fmt, adjust_orientation)]
+#     fmt = "adjust orientation={:s},"
+#     lines = [lines; format(fmt, adjust_orientation)]
 
-    fmt = "number of layers={:2d},"
-    lines = [lines; format(fmt, number_of_layers)]
+#     fmt = "number of layers={:2d},"
+#     lines = [lines; format(fmt, number_of_layers)]
 
-    fmt = "radius of influence={:9.5f}"
-    lines = [lines; format(fmt, radius_of_influence)]
+#     fmt = "radius of influence={:9.5f}"
+#     lines = [lines; format(fmt, radius_of_influence)]
 
-    fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
-    lines = [lines; format(fmt, projection_direction[1], projection_direction[2], projection_direction[3])]
+#     fmt = "{:7.4f}, {:7.4f}, {:7.4f}"
+#     lines = [lines; format(fmt, projection_direction[1], projection_direction[2], projection_direction[3])]
 
-    return lines
+#     return lines
 
-end
+# end
 
 
 function FASTENER_PROPERTY(name, radius)
