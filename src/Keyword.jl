@@ -3,6 +3,81 @@ module Keyword
 using Formatting, Printf
 
 
+
+function AMPLITUDE(name, x, y)
+
+
+
+    lines = @sprintf "*Amplitude, name=%s" name
+
+ 
+    num_rows=size(x)[1]
+
+    #Figure out the number of rows in the set.
+    residual = num_rows/4 - floor(Int, num_rows/4)
+
+    if residual == 0.0
+
+        num_rows = floor(Int, num_rows/4)
+
+    else
+
+        num_rows = floor(Int, num_rows/4) + 1
+        
+    end
+
+
+    for i=1:num_rows 
+
+
+        if (i== num_rows) & (residual > 0.0)   
+
+            residual_inputs = Int(residual * 4)
+            x_last_row =  x[end-residual_inputs + 1:end]
+            y_last_row = y[end-residual_inputs + 1:end]
+
+
+            if residual_inputs == 1
+
+                line = @sprintf "%9.5f,%9.5f" x_last_row[1] y_last_row[1]
+
+            elseif residual_inputs == 2
+
+                line = @sprintf "%9.5f,%9.5f,%9.5f,%9.5f" x_last_row[1] y_last_row[1] x_last_row[2] y_last_row[2]
+
+            elseif residual_inputs == 3
+
+                line = @sprintf "%9.5f,%9.5f,%9.5f,%9.5f,%9.5f,%9.5f" x_last_row[1] y_last_row[1] x_last_row[2] y_last_row[2] x_last_row[3] y_last_row[3]
+
+            elseif residual_inputs == 3
+
+                line = @sprintf "%9.5f,%9.5f,%9.5f,%9.5f,%9.5f,%9.5f,%9.5f,%9.5f" x_last_row[1] y_last_row[1] x_last_row[2] y_last_row[2] x_last_row[3] y_last_row[3] x_last_row[4] y_last_row[4]
+
+            end
+
+            lines = [lines; line]
+
+        else
+
+            range_start = (i-1) * 4 + 1
+            range_end = i * 4  
+            range = range_start:range_end
+       
+            line =  @sprintf "%9.5f,%9.5f,%9.5f,%9.5f,%9.5f,%9.5f,%9.5f,%9.5f" x[range[1]] y[range[1]] x[range[2]] y[range[2]] x[range[3]] y[range[3]] x[range[4]] y[range[4]]
+            lines = [lines; line]
+
+        end
+
+    end
+
+
+    # lines = [lines; line]
+
+    return lines 
+
+end
+
+
 function BOUNDARY(node_set_name, degrees_of_freedom)
 
     lines = "*Boundary"
@@ -43,6 +118,23 @@ function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude)
     # fmt = "{:s}, {:d2},  , {:9.3f}"
     fmt = "%s, %o,  , %9.3f"
     
+
+    for i in eachindex(degrees_of_freedom)
+
+        # lines = [lines; format(fmt, node_set_name, degrees_of_freedom[i], displacement_magnitude)]
+        lines = [lines; @sprintf "%s, %o,  , %9.3f" node_set_name  degrees_of_freedom[i]  displacement_magnitude]
+
+
+    end
+
+    return lines
+
+end
+
+
+function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude, amplitude_table_name)
+
+    lines = @sprintf "*Boundary, amplitude=%s"  amplitude_table_name
 
     for i in eachindex(degrees_of_freedom)
 
@@ -772,15 +864,15 @@ end
 
 function FASTENER(name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers, search_radius, projection_direction)
 
-    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s}, adjust orientation={:s}, number of layers={:2d},"
+    fmt = "*Fastener, interaction name={:s}, property={:s}, reference node set={:s}, elset={:s}, coupling={:s}, attachment method={:s}, weighting method={:s}, "
 
-    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method, adjust_orientation, number_of_layers)
+    lines = format(fmt, name, property, reference_node_set, elset, coupling, attachment_method, weighting_method)
 
     # fmt = "number of layers={:2d},"
     # lines = [lines; format(fmt, number_of_layers)]
 
-    fmt = "search radius={:9.5f}"
-    lines = [lines; format(fmt, search_radius)]
+    fmt = "adjust orientation={:s}, number of layers={:2d}, search radius={:9.5f}"
+    lines = [lines; format(fmt, adjust_orientation, number_of_layers, search_radius)]
 
     # fmt = "radius of influence={:9.5f},"
     # lines = [lines; format(fmt, radius_of_influence)]
