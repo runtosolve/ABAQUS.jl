@@ -1,6 +1,6 @@
 module IO
 
-using ReadWriteFind
+using ReadWriteFind, DelimitedFiles, DataFrames
 
 
 write_file(save_filename, lines) = ReadWriteFind.write_file(save_filename, lines)
@@ -77,48 +77,33 @@ end
 
 
 
-function get_step_load_ratios(filename, file_path)
+function get_sta(filename, file_path)
 
 
-    # all_step_numbers = []
-    # all_load_ratios = []
+    data = DelimitedFiles.readdlm(joinpath(file_path, filename))
+    data = data[6:end, 1:end-3]
 
-    # for i in eachindex(all_beam_names)
+    index = findall(inc -> typeof(inc)==SubString{String}, data[:, 3]) #remove U rows 
 
-        # beam_name = all_beam_names[i]
+    keep_index = setdiff(1:size(data)[1], index)
 
+    data = data[keep_index, :]
 
-        # filename = filenames[i]
-        # filename = beam_name * "_" * model_type * model_version * ".sta"
+    column_names = [:step, :increment, :attempts, :severe_discontinuity_iterations, :equilibrium_iterations, :total_iterations, :total_time, :step_time, :time_increment]
+    sta = DataFrame(data, column_names)
 
-        lines = ReadWriteFind.read_text_file(joinpath(file_path, filename))[6:end-2]
-        lines = ReadWriteFind.read_text_file(joinpath(file_path, filename))[6:end]
+    for i=1:6
+        sta[!, column_names[i]] = Vector{Int64}(sta[!, column_names[i]])
+    end
 
-        step_numbers = []
-        load_ratios = []
+    for i = 7:9
+        sta[!, column_names[i]] = Vector{Float64}(sta[!, column_names[i]])
+    end
 
-        for j in eachindex(lines)
-
-            if !occursin("U", split(lines[j])[3])
-
-                push!(step_numbers, parse(Int, split(lines[j])[2]))
-
-                push!(load_ratios, parse(Float64, split(lines[j])[7]))
-
-            end
-
-        end
-
-        return step_numbers, load_ratios
-
-    #     push!(all_step_numbers, step_numbers)
-    #     push!(all_load_ratios, load_ratios)
-
-    # end
-
-    # return all_step_numbers, all_load_ratios 
+    return sta
 
 end
+
 
 function get_buckling_loads_from_dat(file_path, filename)
 

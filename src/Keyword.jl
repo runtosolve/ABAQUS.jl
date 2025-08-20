@@ -1236,6 +1236,15 @@ function OUTPUT(field_or_history, variable)
 end
 
 
+function OUTPUT_TIME_POINTS(field_or_history, time_points_name)
+
+        lines = @sprintf "*Output, %s, TIME POINTS=%s" field_or_history time_points_name
+      
+    return lines
+
+end
+
+
 function PART(name, node_lines, element_lines, nset_lines, elset_lines, section_lines)
 
     lines = "*Part, name=" * name
@@ -1426,6 +1435,22 @@ function SURFACE_INTERACTION(name, surface_out_of_plane_thickness)
     lines = [lines; format(fmt, surface_out_of_plane_thickness)]
 
     return lines
+
+end
+
+
+function TIME_POINTS(name, points)
+
+    lines = @sprintf "*TIME POINTS, name=%s" name 
+
+    for i in eachindex(points)
+
+        line = @sprintf "%9.5f" points[i]
+        lines = [lines; line]
+
+    end
+
+    return lines 
 
 end
 
