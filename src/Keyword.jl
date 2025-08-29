@@ -78,9 +78,17 @@ function AMPLITUDE(name, x, y)
 end
 
 
-function BOUNDARY(node_set_name, degrees_of_freedom)
+function BOUNDARY(node_set_name, degrees_of_freedom, op)
 
-    lines = "*Boundary"
+    if isempty(op)
+
+        lines = "*Boundary"
+
+    else
+
+        lines = @sprintf"*Boundary, OP=%s" op
+
+    end
 
     fmt = "{:s}, {:d2}"
 
@@ -95,9 +103,19 @@ function BOUNDARY(node_set_name, degrees_of_freedom)
 end
 
 
-function BOUNDARY(node::Int, degrees_of_freedom)
+function BOUNDARY(node::Int, degrees_of_freedom, op)
 
-    lines = "*Boundary"
+    # lines = "*Boundary"
+    if isempty(op)
+
+        lines = "*Boundary"
+
+    else
+
+        lines = @sprintf"*Boundary, OP=%s" op
+
+    end
+
 
     fmt = "{:d8}, {:d2}"
 
@@ -111,9 +129,19 @@ function BOUNDARY(node::Int, degrees_of_freedom)
 
 end
 
-function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude)
+function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude, op)
 
-    lines = "*Boundary"
+    # lines = "*Boundary"
+
+    if isempty(op)
+
+        lines = "*Boundary"
+
+    else
+
+        lines = @sprintf"*Boundary, OP=%s" op
+
+    end
 
     # fmt = "{:s}, {:d2},  , {:9.3f}"
     fmt = "%s, %o,  , %9.3f"
@@ -132,9 +160,22 @@ function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude)
 end
 
 
-function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude, amplitude_table_name)
+function BOUNDARY(node_set_name, degrees_of_freedom, displacement_magnitude, amplitude_table_name::String, op)
 
-    lines = @sprintf "*Boundary, amplitude=%s"  amplitude_table_name
+
+    if isempty(op)
+
+        lines = @sprintf "*Boundary, amplitude=%s"  amplitude_table_name
+
+    else
+
+        lines = @sprintf "*Boundary, OP=%s, amplitude=%s"  op, amplitude_table_name
+
+    end
+
+
+
+    # lines = @sprintf "*Boundary, amplitude=%s"  amplitude_table_name
 
     for i in eachindex(degrees_of_freedom)
 
