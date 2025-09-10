@@ -1480,6 +1480,22 @@ function SURFACE_INTERACTION(name, surface_out_of_plane_thickness)
 end
 
 
+function TIE(name, master_surface, slave_surface, adjust)
+
+    lines = @sprintf"*Tie, name=%s, ADJUST=%s" name adjust
+
+    line = @sprintf"%s, %s" slave_surface master_surface
+
+    lines = [lines; line]
+
+    return lines
+
+end
+
+
+
+
+
 function TIME_POINTS(name, points)
 
     lines = @sprintf "*TIME POINTS, name=%s" name 
