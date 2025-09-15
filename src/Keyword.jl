@@ -431,6 +431,18 @@ function CONTACT_INITIALIZATION_DATA(name, search_above, search_below)
 
 end
 
+
+function CONTACT_PAIR(interaction, type, surface_pair)
+
+    lines = @sprintf("*Contact Pair, interaction=\"%s\", type=%s", interaction, type)
+    line = @sprintf "%s, %s" surface_pair[1] surface_pair[2]
+    lines = [lines; line]
+    
+    return lines 
+
+end
+
+
 function CONTACT_PROPERTY_ASSIGNMENT(surface_name_1, surface_name_2, surface_interaction_name)
 
     lines = "*Contact Property Assignment"
@@ -1444,11 +1456,21 @@ function STEP(name, nlgeom)
 
 end
 
-
-function SURFACE(surface_type, surface_name, elset_name, surface_face)
+#shell element based surface 
+function SURFACE(surface_type, surface_name, elset_name, surface_face::String)
 
     lines = @sprintf "*Surface, type=%s, name=%s" surface_type surface_name
     lines = [lines; @sprintf "%s, %s" elset_name surface_face]
+
+    return lines
+
+end
+
+#node based surface
+function SURFACE(surface_type, surface_name, nset_name, node_area_factor::Float64)
+
+    lines = @sprintf "*Surface, type=%s, name=%s" surface_type surface_name
+    lines = [lines; @sprintf "%s, %7.4f" nset_name node_area_factor]
 
     return lines
 
